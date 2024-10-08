@@ -1,0 +1,16 @@
+###
+POST http://localhost:3000/produtos
+Content-Type: application/json
+
+{
+    "nome": "Produto Exemplo",
+    "fornecedor": "Fornecedor Exemplo",
+    "categoria": 1,
+    "subcategoria": 2,
+    "preco": 99.99,
+    "promocao": false,
+    "bucket": "exemplo-bucket"
+}
+
+###
+GET http://localhost:3000/produtos/:id
