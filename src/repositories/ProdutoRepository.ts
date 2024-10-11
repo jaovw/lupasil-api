@@ -1,4 +1,5 @@
 import prisma from '../config/db';
+import { Produto } from '../interface/Produto';
 
 class ProdutoRepository {
   async findAll() {
@@ -11,29 +12,13 @@ class ProdutoRepository {
     });
   }
 
-  async create(data: {
-    nome: string;
-    fornecedor: string;
-    categoria: number;
-    subcategoria: number;
-    preco: number;
-    promocao: boolean;
-    bucket: string;
-  }) {
+  async create(data: Produto) {
     return await prisma.produto.create({
       data,
     });
   }
 
-  async update(id: string, data: Partial<{
-    nome: string;
-    fornecedor: string;
-    categoria: number;
-    subcategoria: number;
-    preco: number;
-    promocao: boolean;
-    bucket: string;
-  }>) {
+  async update(id: string, data: Partial<Produto>) {
     return await prisma.produto.update({
       where: { id },
       data,

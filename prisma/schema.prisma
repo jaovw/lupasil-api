@@ -10,6 +10,7 @@ datasource db {
 model Produto {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   nome          String
+  descricao     String
   fornecedor    String
   categoria     Int
   subcategoria  Int

@@ -4,6 +4,7 @@ Content-Type: application/json
 
 {
     "nome": "Produto Exemplo",
+    "descricao": "Descricao",
     "fornecedor": "Fornecedor Exemplo",
     "categoria": 1,
     "subcategoria": 2,
@@ -14,3 +15,28 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3000/produtos/:id
+
+###
+POST http://localhost:3000/s3
+Content-Type: multipart/form-data; boundary=MinhaBoundary
+
+--MinhaBoundary
+Content-Disposition: form-data; name="dados"
+Content-Type: application/json
+
+{
+    "nome": "Produto Exemplo",
+    "descricao": "Descricao",
+    "fornecedor": "Fornecedor Exemplo",
+    "categoria": 1,
+    "subcategoria": 2,
+    "preco": 99.99,
+    "promocao": false
+}
+
+--MinhaBoundary
+Content-Disposition: form-data; name="file"; filename="s3_image.png"
+Content-Type: image/png
+
+@file=C:/Users/Joao/Pictures/s3_image.png
+--MinhaBoundary--
