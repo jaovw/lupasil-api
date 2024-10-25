@@ -1,12 +1,20 @@
 import express from 'express';
+import cors from 'cors';
 import dotenv from 'dotenv';
-// import produtoRoutes from './routes/ProdutoRoutes';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 import router from './routes/produtoRoutes';
 
 dotenv.config();
 
 const app = express();
+
+const allowedOrigins = [process.env.REACT_URL!];
+
+const options: cors.CorsOptions = {
+  origin: allowedOrigins
+};
+
+app.use(cors(options))
 
 // Middleware para JSON
 app.use(express.json());

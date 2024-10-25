@@ -8,6 +8,7 @@ export interface Produto {
     preco: number;
     promocao: boolean;
     bucket: string;
+    url?: string;
     createdAt: Date;
     updatedAt?: Date;
   }

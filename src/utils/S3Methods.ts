@@ -1,16 +1,8 @@
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import crypto from "crypto";
-import path from "path";
 import s3 from "../config/s3";
 import { CustomError } from "./CustomError";
-
-// Função para gerar um nome de arquivo único
-const generateFileName = (originalName: string) => {
-  const fileHash = crypto.randomBytes(16).toString("hex");
-  const fileExtension = path.extname(originalName);
-  return `${fileHash}${fileExtension}`;
-};
+import { generateFileName } from "./crypto";
 
 // Função para upload no S3
 export const upload = async (fileBuffer: Buffer, originalName: string, mimeType: string) => {
@@ -42,7 +34,7 @@ export const get = async (fileName: string) => {
 
   try {
     // Gera uma URL assinada válida por um período específico
-    const url = await getSignedUrl(s3, new GetObjectCommand(params), { expiresIn: 3600 });
+    const url: string = await getSignedUrl(s3, new GetObjectCommand(params), { expiresIn: 3600 });
     return url;
   } catch (err) {
     console.error(err);

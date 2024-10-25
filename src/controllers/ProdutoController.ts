@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import ProdutoService from '../services/ProdutoService';
 import { CustomError } from '../utils/CustomError';
 import { Produto } from '../interface/Produto';
-import { upload } from '../utils/s3Methods';
+import { upload } from '../utils/S3Methods';
+import sharp from 'sharp';
 
 class ProdutoController {
   async getProdutos(req: Request, res: Response, next: NextFunction) {
@@ -30,7 +31,9 @@ class ProdutoController {
   async createProduto(req: Request, res: Response, next: NextFunction) {
     try {
       const { buffer, originalname, mimetype} = req.file as any
-      const bucket = await upload(buffer, originalname, mimetype)
+
+      const buffer_ = await sharp(buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer()
+      const bucket = await upload(buffer_, originalname, mimetype)
 
       const { nome, descricao, fornecedor, categoria, subcategoria, preco, promocao } = JSON.parse(req.body.produto);
       const novoProduto: Produto = await ProdutoService.createProduto({
