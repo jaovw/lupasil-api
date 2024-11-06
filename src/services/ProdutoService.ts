@@ -20,12 +20,18 @@ class ProdutoService {
     });
   }
 
-  async createProduto(data: Omit<Produto, 'id' | 'createdAt' | 'updatedAt'>): Promise<Produto> {
+  async createProduto(data: Omit<Produto, 'updatedAt'>): Promise<Produto> {
     return prisma.produto.create({ data });
   }
 
   async updateProduto(id: string, data: Partial<Produto>): Promise<Produto> {
-    return prisma.produto.update({ where: { id }, data });
+    return prisma.produto.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
+      },
+    });
   }
 
   async deleteProduto(id: string): Promise<void> {

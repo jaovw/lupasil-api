@@ -10,13 +10,27 @@ datasource db {
 model Produto {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   nome          String
-  descricao     String
-  fornecedor    String
+  descricao     String?
+  fornecedor    String?
   categoria     Int
-  subcategoria  Int
-  preco         Float
-  promocao      Boolean
+  subcategoria  Int?
+  preco         Float?
+  promocao      Boolean? @default(false)
+  CA            Int
+  estoque       Int?
   bucket        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+
+model Fornecedor {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome          String
+  descricao     String?
+  ativo         String
+  site_url      String?
+  data_incio    DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

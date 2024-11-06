@@ -32,20 +32,13 @@ class ProdutoController {
     try {
       const { buffer, originalname, mimetype} = req.file as any
 
-      const buffer_ = await sharp(buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer()
-      const bucket = await upload(buffer_, originalname, mimetype)
+      // const buffer_ = await sharp(buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer()
+      const bucket = await upload(buffer, originalname, mimetype)
 
-      const { nome, descricao, fornecedor, categoria, subcategoria, preco, promocao } = JSON.parse(req.body.produto);
-      const novoProduto: Produto = await ProdutoService.createProduto({
-        nome,
-        descricao,
-        fornecedor,
-        categoria,
-        subcategoria,
-        preco,
-        promocao,
-        bucket
-      });
+      const Produto: Produto = JSON.parse(req.body.produto);
+      Produto.bucket = bucket;
+
+      const novoProduto: Produto = await ProdutoService.createProduto(Produto);
       res.status(201).json(novoProduto);
     } catch (error) {
       next(error);
