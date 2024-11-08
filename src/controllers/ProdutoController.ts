@@ -3,12 +3,23 @@ import ProdutoService from '../services/ProdutoService';
 import { CustomError } from '../utils/CustomError';
 import { Produto } from '../interface/Produto';
 import { upload } from '../utils/S3Methods';
-import sharp from 'sharp';
+// import sharp from 'sharp';
 
 class ProdutoController {
   async getProdutos(req: Request, res: Response, next: NextFunction) {
     try {
       const produtos: Produto[] = await ProdutoService.getProdutos();
+      res.json(produtos);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getProdutosByFiltro(req: Request, res: Response, next: NextFunction) {
+    try {
+      const filtro: string = req.body.filtro
+      const produtos: Produto[] = await ProdutoService.getProdutosByFiltro(filtro);
+
       res.json(produtos);
     } catch (error) {
       next(error);

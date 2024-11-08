@@ -16,7 +16,7 @@ model Produto {
   subcategoria  Int?
   preco         Float?
   promocao      Boolean? @default(false)
-  CA            Int
+  CA            String
   estoque       Int?
   bucket        String
   createdAt     DateTime @default(now())

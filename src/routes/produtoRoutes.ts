@@ -5,6 +5,7 @@ import upload from '../middlewares/multer';
 const router = Router();
 
 router.get('/produtos', ProdutoController.getProdutos);
+router.post('/produtos/filtro', ProdutoController.getProdutosByFiltro);
 router.get('/produtos/:id', ProdutoController.getProdutoById);
 router.post('/produtos', upload.single('file'), ProdutoController.createProduto);
 router.put('/produtos/:id', ProdutoController.updateProduto);

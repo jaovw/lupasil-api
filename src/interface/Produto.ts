@@ -9,7 +9,7 @@ export interface Produto {
   promocao?: boolean | null;
   bucket: string;
   url?: string;
-  CA: number;
+  CA: string;
   estoque?: number | null;
   createdAt: Date;
   updatedAt?: Date | null;

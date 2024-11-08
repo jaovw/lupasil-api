@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import prisma from "../config/db";
 import { Produto } from "../interface/Produto";
 import { get } from "../utils/S3Methods";
+import { Prisma } from "@prisma/client";
 
 class ProdutoService {
   async getProdutos(): Promise<Produto[]> {
@@ -20,7 +21,18 @@ class ProdutoService {
     });
   }
 
-  async createProduto(data: Omit<Produto, 'updatedAt'>): Promise<Produto> {
+  async getProdutosByFiltro(filtro: string): Promise<Produto[]> {
+    return await prisma.produto.findMany({
+      where: {
+        OR: [
+          { nome: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
+          { CA: { contains: filtro } },
+        ],
+      },
+    });
+  }
+
+  async createProduto(data: Omit<Produto, "updatedAt">): Promise<Produto> {
     return prisma.produto.create({ data });
   }
 
