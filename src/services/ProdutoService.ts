@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import prisma from "../config/db";
 import { Produto } from "../interface/Produto";
-import { get } from "../utils/S3Methods";
+import { get, getUrl } from "../utils/S3Methods";
 import { Prisma } from "@prisma/client";
 
 class ProdutoService {
@@ -9,7 +9,7 @@ class ProdutoService {
     const lista_produto: Produto[] = await prisma.produto.findMany();
     // Buscar ma forma mais dinamica para listar as imagens
     for (const produto of lista_produto) {
-      produto.url = await get(produto.bucket)
+      produto.url = await get(produto.bucket);
     }
 
     return lista_produto;
@@ -22,7 +22,7 @@ class ProdutoService {
   }
 
   async getProdutosByFiltro(filtro: string): Promise<Produto[]> {
-    return await prisma.produto.findMany({
+    const lista_produto: Produto[] = await prisma.produto.findMany({
       where: {
         OR: [
           { nome: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
@@ -30,6 +30,14 @@ class ProdutoService {
         ],
       },
     });
+
+    const lista_url = await getUrl(lista_produto.map((produto) => produto.bucket));
+
+    for (const produto of lista_produto) {
+      produto.url = lista_url.find((url) => url.arquivo == produto.bucket)?.url;
+    }
+
+    return lista_produto;
   }
 
   async createProduto(data: Omit<Produto, "updatedAt">): Promise<Produto> {

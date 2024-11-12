@@ -41,3 +41,24 @@ export const get = async (fileName: string) => {
     throw new CustomError(err as string, 404);
   }
 };
+
+// Função para gerar URLs assinadas para uma lista de arquivos
+export const getUrl = async (nome_arquivo: string[]) => {
+  try {
+    // Mapeia cada nome de arquivo para uma URL assinada
+    const urlPromises = nome_arquivo.map(async (arquivo) => {
+      const params = {
+        Bucket: process.env.BUCKET_NAME!,
+        Key: arquivo,
+      };
+      const url = await getSignedUrl(s3, new GetObjectCommand(params), { expiresIn: 3600 });
+
+      return { arquivo, url };
+    });
+
+    return await Promise.all(urlPromises);
+  } catch (err) {
+    console.error(err);
+    throw new CustomError(err as string, 404);
+  }
+};
