@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build
-        run: acho Building the app
+        run: echo Building the app
   deploy:
     runs-on: ubuntu-latest
     environment:
