@@ -1,28 +1,33 @@
 name: lupasil.com CI
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+
+  workflow_dispatch:
 
 jobs:
-  BuildPushImage:
-    name: Build/Publish Docker Image
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Criação do diretório remoto
-        run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.REMOTE_PORT }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ${{ secrets.TARGET }}"
-
-      - name: Checkout do repositorio
-        uses: actions/checkout@v3
-      - name: Deploy para hosting
-        uses: easingthemes/ssh-deploy@main
-        env:
-          TERM: xterm-256color
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO --delete"
+      - name: Build
+        run: acho Building the app
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: master
+      url: ${{vars.URL}}
+    needs: build
+    steps:
+      - name: Repo Checkout
+        uses: action/checkout@v1
+      - name: Hostiger Deployment
+        uses: easingthemes/ssh-deploy@master
+        with:
+          # TERM: xterm-256color
+          SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
+          ARGS: "-rlgoDzvc --delete"
           SOURCE: "src/"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          TARGET: ${{ secrets.TARGET }}
+          REMOTE_HOST: ${{ vars.REMOTE_HOST }}
+          REMOTE_USER: ${{ vars.REMOTE_USER }}
+          REMOTE_PORT: ${{ vars.REMOTE_PORT }}
+          TARGET: ${{ vars.TARGET }}
