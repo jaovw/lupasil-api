@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
+    "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
     "prisma": "prisma"
   },
