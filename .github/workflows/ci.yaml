@@ -9,8 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - uses: actions/checkout@v4
 
+      # Criar arquivo .env com repository variables
+      - name: Configurar arquivo .env
+        run: |
+          echo "PORT=${{ vars.PORT }}" >> .env
+          echo "REACT_URL=${{ vars.REACT_URL }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "BUCKET_NAME=${{ vars.BUCKET_NAME }}" >> .env
+          echo "BUCKET_REGION=${{ vars.BUCKET_REGION }}" >> .env
+          echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
+          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
+
+      # Executar docker-compose
       - name: Run docker-compose
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
