@@ -3,42 +3,48 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main # O deploy será acionado ao fazer push na branch main
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout do código do repositório
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: yarn install
-
-      # Build do projeto
-      - name: Build project
-        run: |
-          npx tsc
-
-      # Configuração do SSH para conectar ao servidor VPS
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+          node-version: '18'  # Defina a versão do Node.js que você está utilizando
 
-      # Copia os arquivos necessários para o servidor VPS
-      - name: Copy files to server
-        run: |
-          rsync -avz --exclude='.git' --exclude='node_modules' \
-            --exclude='.github' ./ ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }}:/home/${{ vars.SSH_USER }}/lupasil-api
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.yarn/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-      # Executa o Docker Compose no servidor VPS para buildar e subir os containers
-      - name: Deploy with Docker Compose
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run TypeScript build
+        run: yarn tsc --noEmit  # Isso verifica se o código TypeScript está correto, sem gerar arquivos .js
+
+      # - name: Run tests (se você tiver testes, pode rodá-los aqui)
+      #   run: yarn test
+
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}  # Você deve adicionar sua chave privada SSH nos secrets do GitHub
+          VPS_HOST: ${{ vars.SERVER_IP }}  # O IP ou domínio do seu VPS
+          VPS_USER: ${{ vars.SSH_USER }}  # Usuário SSH para acessar seu VPS
         run: |
-          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} << 'EOF'
-          cd /home/${{ vars.SSH_USER }}/lupasil-api
-          docker-compose down # Para qualquer container em execução
-          docker-compose up --build -d # Reconstrói e sobe os containers
-          EOF
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          rsync -avz --exclude node_modules --exclude .git --delete ./ $VPS_USER@$VPS_HOST:/node
+          ssh -i private_key.pem $VPS_USER@$VPS_HOST 'cd /node && yarn install --frozen-lockfile && yarn start'
