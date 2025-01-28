@@ -1,32 +1,51 @@
-name: lupasil.com CI
+name: Deploy to VPS
+
 on:
   push:
     branches:
-      - main
+      - main # O deploy será acionado ao fazer push na branch main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout do código
-      - uses: actions/checkout@v4
+      # Checkout do código do repositório
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Criar arquivo .env com repository variables e secrets
-      - name: Configurar arquivo .env
+      # Configuração do Node.js e instalação das dependências
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      # Build do projeto
+      - name: Build project
         run: |
-          echo "PORT=${{ vars.PORT }}" >> .env
-          echo "REACT_URL=${{ vars.REACT_URL }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "BUCKET_NAME=${{ vars.BUCKET_NAME }}" >> .env
-          echo "BUCKET_REGION=${{ vars.BUCKET_REGION }}" >> .env
-          echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
-          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
+          npx tsc
 
-      # Validar variáveis de ambiente criadas
-      - name: Validar Variáveis de Ambiente
-        run: cat .env
+      # Configuração do SSH para conectar ao servidor VPS
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
-      # Executar docker-compose com o comando 'up'
-      - name: Run docker-compose
-        run: docker-compose --env-file .env up -d
+      # Copia os arquivos necessários para o servidor VPS
+      - name: Copy files to server
+        run: |
+          rsync -avz --exclude='.git' --exclude='node_modules' \
+            --exclude='.github' ./ ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }}:/home/${{ vars.SSH_USER }}/lupasil-api
+
+      # Executa o Docker Compose no servidor VPS para buildar e subir os containers
+      - name: Deploy with Docker Compose
+        run: |
+          ssh ${{ vars.SSH_USER }}@${{ vars.SERVER_IP }} << 'EOF'
+          cd /home/${{ vars.SSH_USER }}/lupasil-api
+          docker-compose down # Para qualquer container em execução
+          docker-compose up --build -d # Reconstrói e sobe os containers
+          EOF
