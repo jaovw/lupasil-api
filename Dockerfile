@@ -3,22 +3,23 @@ FROM node:18-alpine
 # Instala o OpenSSL e outras dependências necessárias
 RUN apk add --no-cache openssl
 
-# create destination directory
+# Cria o diretório de destino
 RUN mkdir -p /usr/src/lupasil-api
 WORKDIR /usr/src/lupasil-api
 
-# Update and install dependency
+# Atualiza e instala dependências
 RUN apk update && apk upgrade
-RUN apk add git
-# docker-compose bash command dependency
-RUN apk add bash
+RUN apk add git bash
 
-# Install app dependencies
-COPY ./package.json .
+# Copia o package.json e instala as dependências
+COPY package.json yarn.lock ./
 RUN yarn install
 
-# Bundle app source
+# Copia o restante do código
 COPY . .
 
-# run
+# Gera o Prisma Client
+RUN npx prisma generate
+
+# Comando para rodar a aplicação
 CMD ["yarn", "start"]
