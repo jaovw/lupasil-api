@@ -15,6 +15,9 @@ RUN apk add git bash
 COPY ./package.json .
 RUN yarn install
 
+# Copia o arquivo .env para o diretório da aplicação
+COPY .env .
+
 # Copia o restante do código
 COPY . .
 
