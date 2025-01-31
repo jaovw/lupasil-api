@@ -12,7 +12,7 @@ RUN apk update && apk upgrade
 RUN apk add git bash
 
 # Copia o package.json e instala as dependências
-COPY package.json yarn.lock ./
+COPY ./package.json .
 RUN yarn install
 
 # Copia o restante do código
