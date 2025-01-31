@@ -18,6 +18,9 @@ RUN yarn install
 # Copia o arquivo .env para o diretório da aplicação
 COPY .env .
 
+# Expõe a porta que a aplicação vai rodar
+EXPOSE 3000
+
 # Copia o restante do código
 COPY . .
 
