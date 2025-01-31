@@ -16,12 +16,12 @@ jobs:
     - name: Criar arquivo .env
       run: |
         echo "PORT=${{ vars.PORT }}" > .env
-        echo 'REACT_URL="${{ vars.REACT_URL }}"' >> .env
-        echo 'DATABASE_URL="${{ secrets.DATABASE_URL }}"' > .env
-        echo 'BUCKET_NAME="${{ vars.BUCKET_NAME }}"' >> .env
-        echo 'BUCKET_REGION="${{ vars.BUCKET_REGION }}"' >> .env
-        echo 'ACCESS_KEY="${{ secrets.ACCESS_KEY }}"' >> .env
-        echo 'SECRET_ACCESS_KEY="${{ secrets.SECRET_ACCESS_KEY }}"' >> .env
+        echo "REACT_URL=${{ vars.REACT_URL }}" >> .env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        echo "BUCKET_NAME=${{ vars.BUCKET_NAME }}" >> .env
+        echo "BUCKET_REGION=${{ vars.BUCKET_REGION }}" >> .env
+        echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
+        echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
